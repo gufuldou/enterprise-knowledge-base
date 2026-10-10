@@ -4,6 +4,7 @@ import org.example.aa.entity.DocumentChunk;
 import org.example.aa.mapper.DocumentChunkMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -22,6 +23,9 @@ public class RetrievalService {
     private final EmbeddingService embeddingService;
     private final JsonMapper jsonMapper;
 
+    @Value("${app.retrieval.similarity-threshold:0.5}")
+    private double similarityThreshold;
+
     public RetrievalService(DocumentChunkMapper chunkMapper,
                             EmbeddingService embeddingService,
                             JsonMapper jsonMapper) {
@@ -38,6 +42,14 @@ public class RetrievalService {
         float[] queryVector = embeddingService.embed(query);
         String queryVectorStr = jsonMapper.writeValueAsString(queryVector);
         List<DocumentChunk> vectorHits = chunkMapper.search(queryVectorStr, topK);
+
+        // 阈值过滤：语义相似度不足，判定为无相关内容
+        if (vectorHits.isEmpty() || vectorHits.get(0).getSimilarity() < similarityThreshold) {
+            double best = vectorHits.isEmpty() ? 0.0 : vectorHits.get(0).getSimilarity();
+            log.info("检索判定为无相关内容: 最高相似度 {} < 阈值 {}",
+                    String.format("%.4f", best), similarityThreshold);
+            return List.of();
+        }
 
         // 词法通道：关键词检索
         List<DocumentChunk> keywordHits = chunkMapper.searchByKeyword(query, topK);

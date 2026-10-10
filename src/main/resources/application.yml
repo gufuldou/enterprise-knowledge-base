@@ -32,3 +32,5 @@ app:
     base-url: https://api.siliconflow.cn/v1
     api-key: ${SILICONFLOW_API_KEY:}
     model: BAAI/bge-m3
+  retrieval:
+    similarity-threshold: 0.5

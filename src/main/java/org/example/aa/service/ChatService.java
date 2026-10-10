@@ -28,7 +28,7 @@ public class ChatService {
         List<RetrievalService.RetrievedChunk> sources = retrievalService.retrieve(question, 3);
 
         if (sources.isEmpty()) {
-            return new RAGAnswer("知识库中暂无内容，请先上传文档。", sources);
+            return new RAGAnswer("知识库中未找到与问题相关的内容。", sources);
         }
 
         StringBuilder context = new StringBuilder();
