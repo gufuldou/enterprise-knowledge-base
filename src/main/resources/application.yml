@@ -1,0 +1,34 @@
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: enterprise-knowledge-base
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/knowledge_base
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+
+  ai:
+    openai:
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY}
+      chat:
+        options:
+          model: deepseek-chat
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+app:
+  upload:
+    dir: E:/999/uploads
+  embedding:
+    base-url: https://api.siliconflow.cn/v1
+    api-key: ${SILICONFLOW_API_KEY:}
+    model: BAAI/bge-m3
