@@ -7,6 +7,7 @@
 -- =============================================================
 
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- 1. 文档元数据表
 CREATE TABLE IF NOT EXISTS kb_document (
@@ -34,3 +35,5 @@ CREATE TABLE IF NOT EXISTS document_chunk (
 CREATE INDEX IF NOT EXISTS idx_document_chunk_document_id ON document_chunk(document_id);
 -- HNSW 近似最近邻索引：余弦距离（vector_cosine_ops）
 CREATE INDEX IF NOT EXISTS idx_document_chunk_embedding ON document_chunk USING hnsw (embedding vector_cosine_ops);
+-- 关键词通道：pg_trgm 三元组索引，用于混合检索的词法匹配
+CREATE INDEX IF NOT EXISTS idx_document_chunk_content_trgm ON document_chunk USING GIN (content gin_trgm_ops);

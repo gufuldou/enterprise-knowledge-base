@@ -35,6 +35,19 @@ public interface DocumentChunkMapper {
 
     @Select("""
         SELECT
+            document_id AS documentId,
+            chunk_index AS chunkIndex,
+            content,
+            similarity(content, #{query}) AS similarity
+        FROM document_chunk
+        WHERE content % #{query}
+        ORDER BY similarity(content, #{query}) DESC
+        LIMIT #{topK}
+        """)
+    List<DocumentChunk> searchByKeyword(@Param("query") String query, @Param("topK") int topK);
+
+    @Select("""
+        SELECT
             id,
             document_id AS documentId,
             chunk_index AS chunkIndex,
